@@ -1,3 +1,5 @@
+import { Privileges } from "electron";
+
 declare namespace ElectronRoutes {
     interface RouterModule {
         Router: typeof Router;
@@ -69,7 +71,7 @@ declare namespace ElectronRoutes {
          * Constructs a new top level router for the given scheme
          * By default scheme = "app"
          */
-        constructor(scheme?: string)
+        constructor(scheme?: string, privileges?: Privileges)
     }
 
     interface PathHandler {

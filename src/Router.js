@@ -6,7 +6,7 @@ const schemes = [];
 global.__router_schemes__ = schemes;
 
 class Router extends MiniRouter {
-  constructor(schemeName = 'app', partitionKey) {
+  constructor(schemeName = 'app', schemePrivileges, partitionKey) {
     if (app.isReady()) {
       throw new Error('Router must be initialized before the app is ready');
     }
@@ -16,7 +16,7 @@ class Router extends MiniRouter {
     super();
     this.schemeName = schemeName;
     schemes.push(schemeName);
-    protocol.registerStandardSchemes([schemeName]);
+    protocol.registerSchemesAsPrivileged([{ scheme: schemeName, privileges: schemePrivileges }]);
     app.on('ready', () => {
       let mProtocol = protocol;
       if (partitionKey) {
