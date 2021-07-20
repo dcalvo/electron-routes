@@ -1,9 +1,9 @@
 {
-  "name": "electron-routes",
+  "name": "@dcalvo/electron-routes",
   "version": "1.4.0",
   "main": "src/index.js",
   "typings": "index.d.ts",
-  "author": "Samuel Attard <samuel.r.attard@gmail.com>",
+  "author": "David Calvo <dcalvo2@jhu.edu>",
   "license": "MIT",
   "dependencies": {
     "electron": "^13.1.7",
