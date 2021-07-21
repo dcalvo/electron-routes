@@ -2,33 +2,47 @@ const { app, BrowserWindow } = require("electron"); // eslint-disable-line
 
 let mainWindow;
 
-global.ElectronRouter = require("../");
+global.ElectronRouter = require("../dist");
 
-global.router = new global.ElectronRouter.Router("test");
-global.router.get("foo/:thing/:other", (req, res) => {
-  res.json(Object.assign({ foo: "bar", thing: req.params.thing }, req));
+// ROUTER TESTS
+global.router = new global.ElectronRouter.Router("test", {
+  standard: true,
+  supportFetchAPI: true,
 });
-global.router.post("send", (req, res) => {
+
+global.router.get("/test", (req, res, next) => {
+  console.log(req);
+  console.log("router_route_get");
+  setTimeout(next, 1000);
+});
+
+global.router.get("/:param", (req, res) => {
+  console.log("router_route_get_params");
+  res.json(Object.assign({ foo: "bar", thing: req.params.param }, req));
+});
+
+global.router.post("/post", (req, res) => {
   console.log(req.uploadData[0].json());
   res.json(Object.assign({ foo: "bar", thing: req.params.thing }, req));
 });
-global.router.get("/test", (req, res) => {
-  console.log(res);
-  res.notFound();
-});
+
+// MINIROUTER TESTS
 const testUse = new global.ElectronRouter.MiniRouter();
-global.router.use(":use", testUse);
-testUse.use("thing", (req, res, next) => {
-  console.log("thing_route_use");
+
+global.router.use("/mini", testUse);
+testUse.use("/thing", (req, res, next) => {
+  console.log("mini_route_use");
   setTimeout(next, 1000);
 });
-testUse.get("thing", (req, res, next) => {
-  console.log("thing_route");
+
+testUse.get("/thing", (req, res, next) => {
+  console.log("mini_route_get");
   setTimeout(next, 1000);
 });
-testUse.get(":this", (req, res) => {
-  console.log("this_route");
-  res.json({ use: req.params.use, this: req.params.this });
+
+testUse.get("/:param", (req, res) => {
+  console.log("mini_route_get_params");
+  res.json({ use: req.params.use, this: req.params.param });
 });
 
 function createWindow() {

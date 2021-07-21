@@ -3,11 +3,31 @@
   <head>
     <meta charset="utf-8" />
     <title>Test</title>
+    <script>
+      async function post() {
+        const rawResponse = await fetch("test://post", {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ a: 1, b: "Textual content" }),
+        });
+        const content = await rawResponse.json();
+
+        console.log(content);
+      }
+    </script>
   </head>
   <body>
-    <a href="test://test">Magic Thing</a>
-    <script>
-      require("../").rendererPreload();
-    </script>
+    <ul>
+      <li><a href="test://test">Router GET, GET with params</a></li>
+      <li>
+        <a href="test://mini/thing">MiniRouter use, GET, GET with params</a>
+      </li>
+      <li>
+        <button onclick="post()">Router POST</button>
+      </li>
+    </ul>
   </body>
 </html>
