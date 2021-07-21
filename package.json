@@ -1,9 +1,12 @@
 {
   "name": "@dcalvo/electron-routes",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "main": "dist/index.js",
   "typings": "index.d.ts",
   "author": "David Calvo",
+  "repository": {
+    "url": "https://github.com/dcalvo/electron-routes"
+  },
   "license": "MIT",
   "dependencies": {
     "electron": "^13.1.7",
