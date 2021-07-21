@@ -1,15 +1,8 @@
 import type { Privileges, UploadData } from "electron";
 
-interface RouterModule {
-  Router: typeof Router;
-  MiniRouter: typeof MiniRouter;
-  /**
-   * Enables CORS and the fetch API with your custom schemes
-   */
-  rendererPreload: () => void;
-}
+export type Method = "get" | "post" | "put" | "delete" | "use";
 
-interface RouterUploadData extends UploadData {
+export interface RouterUploadData extends UploadData {
   json?: () => any;
   stringContent?: () => string;
 }
@@ -62,26 +55,19 @@ export interface Response {
   setHeader(name?: string, value?: string): undefined;
 }
 
-export class Router extends MiniRouter {
-  /**
-   * Constructs a new top level router for the given scheme
-   * By default scheme = "app"
-   */
-  constructor(scheme?: string, privileges?: Privileges);
-}
-
 export interface PathHandler {
   (request: Request, response: Response, next: Function): void;
 }
 
-export class MiniRouter {
-  constructor();
-  get(pathMatch: string, handler: PathHandler): void;
-  post(pathMatch: string, handler: PathHandler): void;
-  put(pathMatch: string, handler: PathHandler): void;
-  delete(pathMatch: string, handler: PathHandler): void;
-  use(pathMatch: string, handler: PathHandler): void;
-  foo(): void;
-
-  use(pathMatch: string, handler: MiniRouter): void;
+export interface HandlerInfo {
+  pathComponent: string;
+  pathRegExp: pathToRegexp.PathRegExp;
+  pathKeys: Key[];
+  callback?: PathHandler;
+  router?: MiniRouter;
 }
+
+export type HandlerBundle = {
+  params: Record<Key["name"], string>;
+  fn: PathHandler;
+};

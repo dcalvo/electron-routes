@@ -1,20 +1,5 @@
 import pathToRegexp, { Key } from "path-to-regexp";
-import { PathHandler } from "../index";
-
-interface HandlerInfo {
-  pathComponent: string;
-  pathRegExp: pathToRegexp.PathRegExp;
-  pathKeys: Key[];
-  callback?: PathHandler;
-  router?: MiniRouter;
-}
-
-export type HandlerBundle = {
-  params: Record<Key["name"], string>;
-  fn: PathHandler;
-};
-
-type Method = "get" | "post" | "put" | "delete" | "use";
+import { HandlerBundle, HandlerInfo, Method, PathHandler } from "..";
 
 export default class MiniRouter {
   _methods: Record<Method, HandlerInfo[]>;

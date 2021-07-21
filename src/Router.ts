@@ -6,17 +6,17 @@ import {
   ProtocolResponse,
   session,
 } from "electron";
-import MiniRouter, { HandlerBundle } from "./MiniRouter";
+import MiniRouter from "./MiniRouter";
 import { WritableStreamBuffer } from "stream-buffers";
-import { Response, RouterUploadData } from "..";
+import { HandlerBundle, Response, RouterUploadData } from "..";
 
-class Router extends MiniRouter {
+export default class Router extends MiniRouter {
   static schemes: string[] = [];
   schemeName: string;
 
   constructor(
     schemeName = "app",
-    schemePrivileges: Privileges,
+    schemePrivileges: Privileges = { standard: true },
     partitionKey: string
   ) {
     if (app.isReady()) {
@@ -52,13 +52,17 @@ class Router extends MiniRouter {
     });
   }
 
-  _handle(request: ProtocolRequest, cb: (response: ProtocolResponse) => void) {
+  _handle(
+    request: ProtocolRequest,
+    cb: (response: Buffer | ProtocolResponse) => void
+  ) {
     const callback = (
       data: Buffer | string | undefined,
       mimeType = "text/html"
     ) => {
       if (data === undefined) {
         cb({ error: -6 });
+        return;
       }
       if (typeof data === "string") {
         data = Buffer.from(data);
@@ -144,5 +148,3 @@ class Router extends MiniRouter {
     }
   }
 }
-
-module.exports = Router;
