@@ -71,3 +71,22 @@ export type HandlerBundle = {
   params: Record<Key["name"], string>;
   fn: PathHandler;
 };
+
+export class MiniRouter {
+  constructor();
+  get(pathMatch: string, handler: PathHandler): void;
+  post(pathMatch: string, handler: PathHandler): void;
+  put(pathMatch: string, handler: PathHandler): void;
+  delete(pathMatch: string, handler: PathHandler): void;
+  use(pathMatch: string, handler: MiniRouter | PathHandler): void;
+
+  processRequest(path: string, method: string, handlers: HandlerBundle[]): void;
+}
+
+export class Router extends MiniRouter {
+  /**
+   * Constructs a new top level router for the given scheme
+   * By default scheme = "app"
+   */
+  constructor(scheme?: string, privileges?: Privileges);
+}

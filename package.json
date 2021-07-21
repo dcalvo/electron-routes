@@ -1,7 +1,7 @@
 {
   "name": "@dcalvo/electron-routes",
-  "version": "1.5.0",
-  "main": "src/index.js",
+  "version": "1.5.1",
+  "main": "dist/index.js",
   "typings": "index.d.ts",
   "author": "David Calvo",
   "license": "MIT",
@@ -20,5 +20,9 @@
     "eslint-config-airbnb-base": "^9.0.0",
     "eslint-plugin-import": "^2.0.0",
     "typescript": "^4.3.5"
-  }
+  },
+  "files": [
+    "dist",
+    "index.d.ts"
+  ]
 }
