@@ -1,4 +1,5 @@
 import type { Privileges, UploadData } from "electron";
+import type { WritableStreamBuffer } from "stream-buffers";
 
 export type Method = "get" | "post" | "put" | "delete" | "use";
 
@@ -34,7 +35,7 @@ export interface Request {
   headers: any;
 }
 
-export interface Response {
+export interface Response extends WritableStreamBuffer {
   /**
    * Will immediately terminate the request sending a stringified version of the object back to the client.
    */
