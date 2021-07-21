@@ -1,4 +1,4 @@
-import type { Privileges } from "electron";
+import type { Privileges, UploadData } from "electron";
 
 interface RouterModule {
   Router: typeof Router;
@@ -9,12 +9,9 @@ interface RouterModule {
   rendererPreload: () => void;
 }
 
-interface UploadData {
-  blobUUID: string;
-  bytes: Buffer;
-  file: string;
-  json: () => any;
-  textContent: () => string;
+interface RouterUploadData extends UploadData {
+  json?: () => any;
+  stringContent?: () => string;
 }
 
 export interface Request {
@@ -25,7 +22,7 @@ export interface Request {
   /**
    * The HTTP method that caused this request. Normally one of get, post, put or delete.
    */
-  method: "GET" | "POST" | "PUT" | "DELETE";
+  method: string;
   /**
    * The URL that referred the client to this URL
    */
@@ -33,7 +30,7 @@ export interface Request {
   /**
    * An array of Electron's uploadData objects. They follow the same structure as found in the Electron docs but with two extra methods.
    */
-  uploadData: UploadData[];
+  uploadData: RouterUploadData[];
   /**
    * The URL of the Request
    */

@@ -3,16 +3,16 @@ import { PathHandler } from "../index";
 
 interface HandlerInfo {
   pathComponent: string;
-  pathRegexp: pathToRegexp.PathRegExp;
+  pathRegExp: pathToRegexp.PathRegExp;
   pathKeys: Key[];
   callback?: PathHandler;
   router?: MiniRouter;
 }
 
-type HandlerBundle = {
+export type HandlerBundle = {
   params: Record<Key["name"], string>;
   fn: PathHandler;
-}[];
+};
 
 type Method = "get" | "post" | "put" | "delete" | "use";
 
@@ -34,7 +34,7 @@ export default class MiniRouter {
     const keys: Key[] = [];
     this._methods[method].push({
       pathComponent: pathMatch,
-      pathRegexp: pathToRegexp(pathMatch, keys),
+      pathRegExp: pathToRegexp(pathMatch, keys),
       pathKeys: keys,
       callback,
     });
@@ -68,7 +68,7 @@ export default class MiniRouter {
     pathMatch = pathMatch.replace(/^\//g, "");
     const use: HandlerInfo = {
       pathComponent: pathMatch,
-      pathRegexp: pathToRegexp(pathMatch, keys, { end: false }),
+      pathRegExp: pathToRegexp(pathMatch, keys, { end: false }),
       pathKeys: keys,
     };
     if (handler.constructor === MiniRouter) {
@@ -81,10 +81,10 @@ export default class MiniRouter {
     this._methods.use.push(use);
   }
 
-  processRequest(path: string, method: string, handlers: HandlerBundle) {
+  processRequest(path: string, method: string, handlers: HandlerBundle[]) {
     path = path.replace(/^\//g, "");
     const testHandler = (tHandler: HandlerInfo) => {
-      const tPathMatches = tHandler.pathRegexp.exec(path);
+      const tPathMatches = tHandler.pathRegExp.exec(path);
       if (tPathMatches) {
         const params: Record<Key["name"], string> = {};
         tHandler.pathKeys.forEach((pathKey, index) => {
@@ -101,9 +101,9 @@ export default class MiniRouter {
     this._methods.use
       .filter((u) => !!u.router)
       .forEach((tHandler) => {
-        const tUseMatches = tHandler.pathRegexp.exec(path);
+        const tUseMatches = tHandler.pathRegExp.exec(path);
         if (tUseMatches) {
-          const useHandlers: HandlerBundle = [];
+          const useHandlers: HandlerBundle[] = [];
           const params: Record<Key["name"], string> = {};
           tHandler.pathKeys.forEach((pathKey, index) => {
             params[pathKey.name] = tUseMatches[index + 1];
