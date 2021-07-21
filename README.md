@@ -40,7 +40,9 @@ fetch("myscheme://foo")
 
 ## API
 
-### Router(schemeName = 'app', schemePrivileges, partitionName)
+### Router(schemeName = 'app', schemePrivileges = { standard: true }, partitionName)
+
+`schemePrivileges` is the same structure as found in the [Electron docs](https://www.electronjs.org/docs/api/structures/custom-scheme).
 
 #### router.\[method\](pathPattern, handler)
 
@@ -135,12 +137,6 @@ back to the client.
 
 Will immediately terminate the request with a 404 File Not Found response
 
-## Team
-
-| [![Sindre Sorhus](https://s.gravatar.com/avatar/1576c987b53868acf73d6ccb08110a78?s=144)](https://sindresorhus.com) |
-| ------------------------------------------------------------------------------------------------------------------ |
-| [Samuel Attard](https://samuelattard.com)                                                                          |
-
 ## License
 
-MIT © [Sindre Sorhus](https://sindresorhus.com)
+MIT ©
