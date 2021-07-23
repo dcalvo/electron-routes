@@ -12,6 +12,7 @@ global.router = new global.ElectronRouter.Router("test", {
 
 global.router.get("/test", (req, res, next) => {
   console.log(req);
+  console.log(req.query);
   console.log("router_route_get");
   setTimeout(next, 1000);
 });

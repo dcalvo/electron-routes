@@ -1,3 +1,5 @@
+import { HandlerBundle, Response, RouterUploadData } from ".."
+import MiniRouter from "./MiniRouter"
 import {
   app,
   Privileges,
@@ -5,14 +7,13 @@ import {
   ProtocolRequest,
   ProtocolResponse,
   session,
-} from "electron";
-import MiniRouter from "./MiniRouter";
-import { WritableStreamBuffer } from "stream-buffers";
-import { HandlerBundle, Response, RouterUploadData } from "..";
+} from "electron"
+import { WritableStreamBuffer } from "stream-buffers"
+import qs from "qs"
 
 export default class Router extends MiniRouter {
-  static schemes: string[] = [];
-  schemeName: string;
+  static schemes: string[] = []
+  schemeName: string
 
   constructor(
     schemeName = "app",
@@ -20,36 +21,36 @@ export default class Router extends MiniRouter {
     partitionKey: string
   ) {
     if (app.isReady()) {
-      throw new Error("Router must be initialized before the app is ready");
+      throw new Error("Router must be initialized before the app is ready")
     }
     if (Router.schemes.includes(schemeName)) {
       throw new Error(
         `Reusing router schemes is not allowed, there is already a scheme registed called ${schemeName}`
-      );
+      )
     }
-    super();
-    this.schemeName = schemeName;
-    Router.schemes.push(schemeName);
+    super()
+    this.schemeName = schemeName
+    Router.schemes.push(schemeName)
     protocol.registerSchemesAsPrivileged([
       { scheme: schemeName, privileges: schemePrivileges },
-    ]);
+    ])
     app.on("ready", () => {
-      let mProtocol = protocol;
+      let mProtocol = protocol
       if (partitionKey) {
-        mProtocol = session.fromPartition(partitionKey).protocol;
+        mProtocol = session.fromPartition(partitionKey).protocol
       }
-      mProtocol.registerBufferProtocol(schemeName, this._handle.bind(this));
-    });
+      mProtocol.registerBufferProtocol(schemeName, this._handle.bind(this))
+    })
   }
 
   _nicePost(uploadData: RouterUploadData[]) {
     return uploadData.map((data) => {
       if (data.bytes) {
-        data.stringContent = () => data.bytes!.toString();
-        data.json = () => JSON.parse(data.stringContent!());
+        data.stringContent = () => data.bytes!.toString()
+        data.json = () => JSON.parse(data.stringContent!())
       }
-      return data;
-    });
+      return data
+    })
   }
 
   _handle(
@@ -61,26 +62,27 @@ export default class Router extends MiniRouter {
       mimeType = "text/html"
     ) => {
       if (data === undefined) {
-        cb({ error: -6 });
-        return;
+        cb({ error: -6 })
+        return
       }
       if (typeof data === "string") {
-        data = Buffer.from(data);
+        data = Buffer.from(data)
       }
       cb({
         mimeType,
         data,
-      });
-    };
+      })
+    }
 
-    const { url, referrer, method, uploadData } = request;
-    const path = url.substr(this.schemeName.length + 3);
-    const handlers: HandlerBundle[] = [];
-    this.processRequest(path, method, handlers);
+    const { url, referrer, method, uploadData } = request
+    const path = url.split("?")[0].substr(this.schemeName.length + 3)
+    const query = qs.parse(url.split("?")[1])
+    const handlers: HandlerBundle[] = []
+    this.processRequest(path, method, handlers)
     if (handlers.length === 0) {
-      callback(undefined);
+      callback(undefined)
     } else {
-      let calledBack = false;
+      let calledBack = false
       // Move out of scope so it can be mutated
       const req = {
         params: {},
@@ -89,23 +91,24 @@ export default class Router extends MiniRouter {
         uploadData: this._nicePost(uploadData || []),
         url: request.url,
         headers: {},
-      };
+        query,
+      }
       const attemptHandler = (index: number) => {
-        const tHandler = handlers[index];
-        req.params = tHandler.params;
+        const tHandler = handlers[index]
+        req.params = tHandler.params
         const called =
           (fn: (...args: any[]) => any) =>
           (...args: any[]) => {
-            if (calledBack) throw new Error("Already callled back");
-            calledBack = true;
-            fn(...args);
-          };
+            if (calledBack) throw new Error("Already callled back")
+            calledBack = true
+            fn(...args)
+          }
 
         let res = new WritableStreamBuffer({
           initialSize: 1024 * 1024,
           incrementAmount: 10 * 1024,
-        });
-        const originalEnd = res.end.bind(res);
+        })
+        const originalEnd = res.end.bind(res)
         const routerRes: Response = Object.assign(res, {
           json: called((object: object) => callback(JSON.stringify(object))),
           send: called((string: string, mimeType: string) =>
@@ -113,38 +116,38 @@ export default class Router extends MiniRouter {
           ),
           notFound: called(() => callback(undefined)),
           end: called((data, ...args) => {
-            originalEnd(data, ...args);
+            originalEnd(data, ...args)
             if (typeof data === "string") {
-              callback(data);
+              callback(data)
             } else if (data instanceof Buffer) {
-              callback(data);
+              callback(data)
             } else if (
               res.size() > 0 &&
               (res.getContentsAsString("utf8") as string).length > 0
             ) {
-              callback(res.getContentsAsString("utf8") as string);
+              callback(res.getContentsAsString("utf8") as string)
             } else {
-              callback("");
+              callback("")
             }
           }),
           setHeader: () => undefined,
           getHeader: () => undefined,
-        });
+        })
 
         const next = () => {
           if (calledBack)
             throw new Error(
               "Can't call next once data has already been sent as a response"
-            );
+            )
           if (index + 1 < handlers.length) {
-            attemptHandler(index + 1);
+            attemptHandler(index + 1)
           } else {
-            routerRes.notFound();
+            routerRes.notFound()
           }
-        };
-        tHandler.fn(req, routerRes, next);
-      };
-      attemptHandler(0);
+        }
+        tHandler.fn(req, routerRes, next)
+      }
+      attemptHandler(0)
     }
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "@dcalvo/electron-routes",
-  "version": "1.5.2",
+  "version": "1.5.3",
   "main": "dist/index.js",
   "typings": "index.d.ts",
   "author": "David Calvo",
@@ -11,6 +11,7 @@
   "dependencies": {
     "electron": "^13.1.7",
     "path-to-regexp": "^1.6.0",
+    "qs": "^6.10.1",
     "stream-buffers": "^3.0.1"
   },
   "scripts": {
@@ -18,6 +19,7 @@
     "build": "tsc"
   },
   "devDependencies": {
+    "@types/qs": "^6.9.7",
     "@types/stream-buffers": "^3.0.4",
     "eslint": "^3.8.1",
     "eslint-config-airbnb-base": "^9.0.0",
